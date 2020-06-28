@@ -39,9 +39,7 @@ class GeckoDynamicsApplicationTest {
         // Given
         String input = readFileToString("src/test/resources/data/dataCorrect1.txt");
 
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.
-                post(BASE_URL + ADD)
-                .content(input);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
 
         // When
         MvcResult mvcResult = mockMvc.perform(requestBuilder)
@@ -59,9 +57,7 @@ class GeckoDynamicsApplicationTest {
         // Given
         String input = readFileToString("src/test/resources/data/dataCorrect2.txt");
 
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.
-                post(BASE_URL + ADD)
-                .content(input);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
 
         // When
         MvcResult mvcResult = mockMvc.perform(requestBuilder)
@@ -79,9 +75,7 @@ class GeckoDynamicsApplicationTest {
         // Given
         String input = readFileToString("src/test/resources/data/dataIncorrect_badHeaders.txt");
 
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.
-                post(BASE_URL + ADD)
-                .content(input);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
 
         // When
         MvcResult mvcResult = mockMvc.perform(requestBuilder)
@@ -99,27 +93,30 @@ class GeckoDynamicsApplicationTest {
         // Given
         String input = readFileToString("src/test/resources/data/dataIncorrect_badRecord.txt");
 
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.
-                post(BASE_URL + ADD)
-                .content(input);
+        MockHttpServletRequestBuilder addRequest = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
+        MockHttpServletRequestBuilder getIncorrectRequest = MockMvcRequestBuilders.get(BASE_URL + GET_INCORRECT);
 
         // When
-        MvcResult mvcResult = mockMvc.perform(requestBuilder)
-                .andExpect(status().is(UNPROCESSABLE_ENTITY.value()))
+        MvcResult addResult = mockMvc.perform(addRequest).andExpect(status().isOk()).andReturn();
+
+        MockHttpServletResponse addResponse = addResult.getResponse();
+        assertThat(addResponse).isNotNull();
+        assertThat(addResponse.getContentAsString()).isEqualTo("Added 0 records");
+
+        MvcResult getIncorrectResult = mockMvc.perform(getIncorrectRequest)
+                .andExpect(status().isOk())
                 .andReturn();
 
         // Then
-        MockHttpServletResponse response = mvcResult.getResponse();
-        assertThat(response).isNotNull();
-        assertThat(response.getContentAsString()).isEqualTo("Input body is not correct");
+        MockHttpServletResponse getResponse = getIncorrectResult.getResponse();
+        assertThat(getResponse).isNotNull();
+        assertThat(getResponse.getContentAsString()).contains("val1;val2;val3;val4;val5;");
     }
-
 
     @Test
     public void getNotExistingRecord() throws Exception {
         // Given
-        MockHttpServletRequestBuilder getRequest = MockMvcRequestBuilders
-                .get(BASE_URL + GET + "?key=val1");
+        MockHttpServletRequestBuilder getRequest = MockMvcRequestBuilders.get(BASE_URL + GET + "?key=val12345");
 
         // When
         MvcResult mvcResult = mockMvc.perform(getRequest)
@@ -136,7 +133,7 @@ class GeckoDynamicsApplicationTest {
     public void addAndGetRecord() throws Exception {
         // Given
         String input = readFileToString("src/test/resources/data/dataCorrect1.txt");
-        String expected_record = "{\"primary_key\":\"val1\",\"name\":\"val2\",\"description\":\"val3\",\"updated_timestamp\":\"val4\"}";
+        String expected_record = "{\"primary_key\":\"val1\",\"name\":\"val2\",\"description\":\"val3\",\"updated_timestamp\":\"2020-07-01T19:34:50.630Z\"}";
 
         MockHttpServletRequestBuilder addRequest = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
         MockHttpServletRequestBuilder readRequest = MockMvcRequestBuilders.get(BASE_URL + GET + "?key=val1");
@@ -166,7 +163,7 @@ class GeckoDynamicsApplicationTest {
     public void addAndDeletedRecord() throws Exception {
         // Given
         String input = readFileToString("src/test/resources/data/dataCorrect1.txt");
-        String expected_record = "{\"primary_key\":\"val1\",\"name\":\"val2\",\"description\":\"val3\",\"updated_timestamp\":\"val4\"}";
+        String expected_record = "{\"primary_key\":\"val1\",\"name\":\"val2\",\"description\":\"val3\",\"updated_timestamp\":\"2020-07-01T19:34:50.630Z\"}";
 
         MockHttpServletRequestBuilder addRequest = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
         MockHttpServletRequestBuilder readRequest = MockMvcRequestBuilders.get(BASE_URL + GET + "?key=val1");

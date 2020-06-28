@@ -36,6 +36,14 @@ public class MainController {
         return ResponseEntity.ok("ClientData not found");
     }
 
+    @GetMapping(GET_INCORRECT)
+    @ResponseBody
+    public ResponseEntity getIncorrect() {
+        List<String> incorrectInputs = parser.getIncorrectInputs();
+        log.info("Found {} incorrect inputs {}", incorrectInputs.size(), incorrectInputs);
+        return ResponseEntity.ok(incorrectInputs);
+    }
+
     @PostMapping(ADD)
     @ResponseBody
     public ResponseEntity addData(@RequestBody String input) {
@@ -46,8 +54,7 @@ public class MainController {
 
         } catch (Exception e) {
             log.error("Error during saving clientData", e);
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body("Input body is not correct");
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Input body is not correct");
         }
     }
 
