@@ -21,6 +21,8 @@ import static skocz.mateusz.geckoDynamics.controller.Endpoints.*;
 public class MainController {
     @Autowired
     private ClientDataDao dao;
+    @Autowired
+    private ClientDataParser parser;
 
     @GetMapping(GET)
     @ResponseBody
@@ -38,7 +40,7 @@ public class MainController {
     @ResponseBody
     public ResponseEntity addData(@RequestBody String input) {
         try {
-            List<ClientData> clientData = ClientDataParser.parse(input);
+            List<ClientData> clientData = parser.parse(input);
             List<ClientData> result = dao.saveAll(clientData);
             return ResponseEntity.ok("Added " + result.size() + " records");
 

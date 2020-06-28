@@ -51,7 +51,7 @@ public class ClientDataDao {
     //todo: remove it!!
     @EventListener(ApplicationReadyEvent.class)
     public void fillDB() {
-        save(new ClientData("key1", "someName1", "desc1", " "));
+        save(new ClientData("key1", "someName1", "desc1", null));
 
     }
 }
