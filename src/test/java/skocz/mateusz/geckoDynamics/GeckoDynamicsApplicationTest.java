@@ -1,5 +1,6 @@
 package skocz.mateusz.geckoDynamics;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -133,7 +134,7 @@ class GeckoDynamicsApplicationTest {
     public void addAndGetRecord() throws Exception {
         // Given
         String input = readFileToString("src/test/resources/data/dataCorrect1.txt");
-        String expected_record = "{\"primary_key\":\"val1\",\"name\":\"val2\",\"description\":\"val3\",\"updated_timestamp\":\"2020-07-01T19:34:50.630Z\"}";
+        String expected_record = "{\"primary_key\":\"val1\",\"name\":\"val2\",\"description\":\"val3\",\"updated\":\"2020-07-01T19:34:50.630Z\"}";
 
         MockHttpServletRequestBuilder addRequest = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
         MockHttpServletRequestBuilder readRequest = MockMvcRequestBuilders.get(BASE_URL + GET + "?key=val1");
@@ -158,12 +159,81 @@ class GeckoDynamicsApplicationTest {
         assertThat(readResponse.getContentAsString()).isEqualTo(expected_record);
     }
 
+    @Test
+    public void addAndGetRecordAfterUpdated() throws Exception {
+        // Given
+        String input = readFileToString("src/test/resources/data/dataCorrect3.txt");
+        String expected_record1 = "{\"primary_key\":\"key2\",\"name\":\"name2\",\"description\":\"desc3\",\"updated\":\"2020-07-02T19:34:50.630Z\"}";
+        String expected_record2 = "{\"primary_key\":\"key3\",\"name\":\"name3\",\"description\":\"desc4\",\"updated\":\"2020-07-03T19:34:50.630Z\"}";
+
+        MockHttpServletRequestBuilder addRequest = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
+        MockHttpServletRequestBuilder readBeforeRequest = MockMvcRequestBuilders.get(BASE_URL + GET_BY_DATE + "?after=2020-07-02T00:00:00.000Z");
+
+        // When
+        mockMvc.perform(addRequest)
+                .andExpect(status().isOk());
+
+        MvcResult readBeforeResult = mockMvc.perform(readBeforeRequest)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // Then
+        MockHttpServletResponse readResponse = readBeforeResult.getResponse();
+        assertThat(readResponse).isNotNull();
+        assertThat(readResponse.getContentAsString()).isEqualTo("[" + expected_record1 + "," + expected_record2 + "]");
+    }
+
+    @Test
+    public void addAndGetRecordBeforeUpdated() throws Exception {
+        // Given
+        String input = readFileToString("src/test/resources/data/dataCorrect1.txt");
+        String expected_record = "{\"primary_key\":\"val1\",\"name\":\"name2\",\"description\":\"val3\",\"updated\":\"2020-07-01T19:34:50.630Z\"}";
+
+        MockHttpServletRequestBuilder addRequest = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
+        MockHttpServletRequestBuilder readBeforeRequest = MockMvcRequestBuilders.get(BASE_URL + GET_BY_DATE + "?before=2020-07-02T00:00:00.000Z");
+
+        // When
+        mockMvc.perform(addRequest)
+                .andExpect(status().isOk());
+
+        MvcResult readBeforeResult = mockMvc.perform(readBeforeRequest)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // Then
+        MockHttpServletResponse readResponse = readBeforeResult.getResponse();
+        assertThat(readResponse).isNotNull();
+        assertThat(readResponse.getContentAsString()).isEqualTo("[" + expected_record + "]");
+    }
+
+    @Test
+    public void addAndGetRecordBeforeAndAfterUpdated() throws Exception {
+        // Given
+        String input = readFileToString("src/test/resources/data/dataCorrect3.txt");
+        String expected_record1 = "{\"primary_key\":\"key2\",\"name\":\"name2\",\"description\":\"desc3\",\"updated\":\"2020-07-02T19:34:50.630Z\"}";
+
+        MockHttpServletRequestBuilder addRequest = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
+        MockHttpServletRequestBuilder readBeforeRequest = MockMvcRequestBuilders.get(BASE_URL + GET_BY_DATE + "?after=2020-07-02T00:00:00.000Z&before=2020-07-03T00:00:00.000Z");
+
+        // When
+        mockMvc.perform(addRequest)
+                .andExpect(status().isOk());
+
+        MvcResult readBeforeResult = mockMvc.perform(readBeforeRequest)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // Then
+        MockHttpServletResponse readResponse = readBeforeResult.getResponse();
+        assertThat(readResponse).isNotNull();
+        assertThat(readResponse.getContentAsString()).isEqualTo("[" + expected_record1 + "]");
+    }
 
     @Test
     public void addAndDeletedRecord() throws Exception {
         // Given
         String input = readFileToString("src/test/resources/data/dataCorrect1.txt");
-        String expected_record = "{\"primary_key\":\"val1\",\"name\":\"val2\",\"description\":\"val3\",\"updated_timestamp\":\"2020-07-01T19:34:50.630Z\"}";
+        String expected_record = "{\"primary_key\":\"val1\",\"name\":\"val2\",\"description\":\"val3\",\"updated\":\"2020-07-01T19:34:50.630Z\"}";
 
         MockHttpServletRequestBuilder addRequest = MockMvcRequestBuilders.post(BASE_URL + ADD).content(input);
         MockHttpServletRequestBuilder readRequest = MockMvcRequestBuilders.get(BASE_URL + GET + "?key=val1");

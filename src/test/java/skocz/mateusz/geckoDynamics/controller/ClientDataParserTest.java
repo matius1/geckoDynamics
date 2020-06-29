@@ -120,7 +120,7 @@ class ClientDataParserTest {
                 .primary_key("val1")
                 .name("val2")
                 .description("val3")
-                .updated_timestamp(Instant.parse("2020-07-01T19:34:50.63Z"))
+                .updated(Instant.parse("2020-07-01T19:34:50.63Z"))
                 .build();
 
         // When
@@ -142,7 +142,7 @@ class ClientDataParserTest {
                 .primary_key("val1")
                 .name("val2")
                 .description("val3")
-                .updated_timestamp(Instant.parse("2020-07-01T19:34:50.63Z"))
+                .updated(Instant.parse("2020-07-01T19:34:50.63Z"))
                 .build();
 
         // When

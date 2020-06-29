@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
@@ -20,6 +20,7 @@ public class ClientData {
     private String primary_key;
     private String name;
     private String description;
-    private Instant updated_timestamp;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private Instant updated;
 
 }

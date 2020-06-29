@@ -90,7 +90,7 @@ public class ClientDataParser {
                     .primary_key(fields.get(0))
                     .name(fields.get(1))
                     .description(fields.get(2))
-                    .updated_timestamp(tryParseTimestamp(fields.get(3)))
+                    .updated(tryParseTimestamp(fields.get(3)))
                     .build();
         } catch (Exception e) {
             log.warn("Parsing input failed [{}]", line, e);
@@ -112,4 +112,11 @@ public class ClientDataParser {
         throw new IllegalArgumentException("Parsing timestamp failed: " + input);
     }
 
+    public Instant parseTimestampOrNull(String input){
+        try {
+            return tryParseTimestamp(input);
+        }catch (Exception e){
+            return null;
+        }
+    }
 }
