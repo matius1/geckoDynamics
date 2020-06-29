@@ -87,8 +87,6 @@ public class MainController {
         dao.deleteByKey(key);
         log.info("Deleted record with key: {}", key);
         return ResponseEntity.ok("Record removed");
-
     }
-
 
 }

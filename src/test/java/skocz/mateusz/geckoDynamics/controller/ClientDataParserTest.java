@@ -29,10 +29,10 @@ class ClientDataParserTest {
     @Test
     public void shouldParseOneRecord() {
         // Given
-        String input = "PRIMARY_KEY,NAME,DESCRIPTION,UPDATED_TIMESTAMP\n" +
+        final String input = "PRIMARY_KEY,NAME,DESCRIPTION,UPDATED_TIMESTAMP\n" +
                 "val1;val2;val3;2020-07-01T19:34:50.63Z;\n";
         // When
-        List<ClientData> result = PARSER.parse(input);
+        final List<ClientData> result = PARSER.parse(input);
 
         // Then
         assertThat(result).isNotNull();
@@ -42,10 +42,10 @@ class ClientDataParserTest {
     @Test
     public void shouldPassValidationHeaders() {
         // Given
-        String input = "PRIMARY_KEY,NAME,DESCRIPTION,UPDATED_TIMESTAMP";
+        final String input = "PRIMARY_KEY,NAME,DESCRIPTION,UPDATED_TIMESTAMP";
 
         // When
-        boolean isValid = PARSER.validateHeader(input);
+        final boolean isValid = PARSER.validateHeader(input);
 
         // Then
         assertThat(isValid).isTrue();
@@ -54,10 +54,10 @@ class ClientDataParserTest {
     @Test
     public void shouldPassValidationHeadersCaseInsensitive() {
         // Given
-        String input = "primary_key,name,description,updated_timestamp";
+        final String input = "primary_key,name,description,updated_timestamp";
 
         // When
-        boolean isValid = PARSER.validateHeader(input);
+        final boolean isValid = PARSER.validateHeader(input);
 
         // Then
         assertThat(isValid).isTrue();
@@ -66,57 +66,21 @@ class ClientDataParserTest {
     @Test
     public void shouldFailsValidationHeaders() {
         // Given
-        String input = "PRIMARY_KEY,NAME,DESCRIPTION";
+        final String input = "PRIMARY_KEY,NAME,DESCRIPTION";
 
         // When
-        boolean isValid = PARSER.validateHeader(input);
+        final boolean isValid = PARSER.validateHeader(input);
 
         // Then
         assertThat(isValid).isFalse();
-    }
-
-    @Test
-    public void shouldFailsWhenFieldsToMany() {
-        // Given
-        String input = "val1;val2;val3;2020-07-01T19:34:50.63Z;val5";
-
-        // When
-        boolean isValid = PARSER.containsAllFields(input);
-
-        // Then
-        assertThat(isValid).isFalse();
-    }
-
-    @Test
-    public void shouldFailsWhenFieldsNotEnough() {
-        // Given
-        String input = "val1;val2;val3";
-
-        // When
-        boolean isValid = PARSER.containsAllFields(input);
-
-        // Then
-        assertThat(isValid).isFalse();
-    }
-
-    @Test
-    public void shouldPassAllWhenFields() {
-        // Given
-        String input = "val1;val2;val3;2020-07-01T19:34:50.63Z";
-
-        // When
-        boolean isValid = PARSER.containsAllFields(input);
-
-        // Then
-        assertThat(isValid).isTrue();
     }
 
     @Test
     public void shouldParseToClientData() {
         // Given
-        String input = "val1;val2;val3;2020-07-01T19:34:50.63Z";
+        final String input = "val1;val2;val3;2020-07-01T19:34:50.63Z";
 
-        ClientData expected = ClientData.builder()
+        final ClientData expected = ClientData.builder()
                 .primary_key("val1")
                 .name("val2")
                 .description("val3")
@@ -124,7 +88,7 @@ class ClientDataParserTest {
                 .build();
 
         // When
-        ClientData actual = PARSER.toClientData(input);
+        final ClientData actual = PARSER.toClientData(input);
 
         // Then
         assertThat(actual).isNotNull();
@@ -134,9 +98,9 @@ class ClientDataParserTest {
     @Test
     public void shouldParseValidRecordAndAddToListInvalid() {
         // Given
-        String headers = "PRIMARY_KEY,NAME,DESCRIPTION,UPDATED_TIMESTAMP";
-        String validInput = "val1;val2;val3;2020-07-01T19:34:50.63Z";
-        String invalidInput = "!@#$%";
+        final String headers = "PRIMARY_KEY,NAME,DESCRIPTION,UPDATED_TIMESTAMP";
+        final String validInput = "val1;val2;val3;2020-07-01T19:34:50.63Z";
+        final String invalidInput = "!@#$%";
 
         ClientData expected = ClientData.builder()
                 .primary_key("val1")
@@ -147,7 +111,7 @@ class ClientDataParserTest {
 
         // When
         PARSER.emptyIncorrectInputs();
-        List<ClientData> clientData = PARSER.parse(headers + "\n" + validInput + "\n" + invalidInput);
+        final List<ClientData> clientData = PARSER.parse(headers + "\n" + validInput + "\n" + invalidInput);
 
         // Then
         assertThat(clientData).isNotNull();
@@ -160,11 +124,11 @@ class ClientDataParserTest {
     @Test
     public void shouldNotParseIncorrectInputAndAddToList() {
         // Given
-        String input = "val1;val2;val3;2020-07";
+        final String input = "val1;val2;val3;2020-07";
 
         // When
         PARSER.emptyIncorrectInputs();
-        ClientData actual = PARSER.toClientData(input);
+        final ClientData actual = PARSER.toClientData(input);
 
         // Then
         assertThat(actual).isNull();
@@ -175,11 +139,11 @@ class ClientDataParserTest {
     @Test
     public void shouldParseTimestampFormatISO_DATE_TIME() {
         // Given
-        String input = "2020-07-01T19:34:50.63Z";
-        Instant expected = Instant.from(ISO_DATE_TIME.parse("2020-07-01T19:34:50.63Z"));
+        final String input = "2020-07-01T19:34:50.63Z";
+        final Instant expected = Instant.from(ISO_DATE_TIME.parse("2020-07-01T19:34:50.63Z"));
 
         // When
-        Instant actual = PARSER.tryParseTimestamp(input);
+        final Instant actual = PARSER.tryParseTimestamp(input);
 
         // Then
         assertThat(actual).isNotNull();
@@ -189,18 +153,17 @@ class ClientDataParserTest {
     @Test
     public void shouldParseTimestampFormatISO_LOCAL_DATE_TIME() {
         // Given
-        String input = "2020-07-01 19:34:50";
+        final String input = "2020-07-01 19:34:50";
 
-        DateTimeFormatter dateTimeFormatter = ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
-        Instant expected = Instant.from(dateTimeFormatter.parse("2020-07-01 19:34:50"));
+        final DateTimeFormatter dateTimeFormatter = ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
+        final Instant expected = Instant.from(dateTimeFormatter.parse("2020-07-01 19:34:50"));
 
         // When
-        Instant actual = PARSER.tryParseTimestamp(input);
+        final Instant actual = PARSER.tryParseTimestamp(input);
 
         // Then
         assertThat(actual).isNotNull();
         assertThat(actual).isEqualTo(expected);
     }
-
 
 }

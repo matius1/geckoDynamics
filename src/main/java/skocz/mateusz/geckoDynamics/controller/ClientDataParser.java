@@ -24,11 +24,9 @@ public class ClientDataParser {
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
     public static final String HEADERS = "PRIMARY_KEY,NAME,DESCRIPTION,UPDATED_TIMESTAMP";
     public static final String COMMA_SEPARATOR = ";";
-    public static final int NUMBER_OF_FIELDS = 4;
     public static final List<DateTimeFormatter> FORMATTERS = ImmutableList.of(ISO_DATE_TIME, ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault()));
 
     private List<String> incorrectInputs = Lists.newArrayList();
-
 
     public List<String> getIncorrectInputs() {
         return incorrectInputs;
@@ -42,7 +40,6 @@ public class ClientDataParser {
         incorrectInputs.clear();
     }
 
-
     public List<ClientData> parse(String input) {
         if (input == null) {
             throw new IllegalArgumentException("ClientData is null");
@@ -55,28 +52,16 @@ public class ClientDataParser {
             throw new IllegalArgumentException("ClientData do not contains correct headers");
         }
 
-        List<ClientData> clientData = lines.stream()
-                .filter(line -> isNotHeaders(line))
+        return lines.stream()
+                .filter(this::isNotHeaders)
                 .filter(line -> !line.isEmpty())
-                .map(line -> toClientData(line))
+                .map(this::toClientData)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-
-        return clientData;
     }
 
     public boolean validateHeader(String input) {
         return input.toUpperCase().contains(HEADERS);
-    }
-
-    boolean containsAllFields(String input) {
-        if (input.split(COMMA_SEPARATOR).length != NUMBER_OF_FIELDS) {
-            log.info("ClientData do not contains all 4 fields. Input: {}", input);
-//            throw new IllegalArgumentException("ClientData do not contains all required fields. Input: " + input);
-            //todo: store it!
-            return false;
-        }
-        return true;
     }
 
     private boolean isNotHeaders(String line) {
@@ -112,11 +97,12 @@ public class ClientDataParser {
         throw new IllegalArgumentException("Parsing timestamp failed: " + input);
     }
 
-    public Instant parseTimestampOrNull(String input){
+    public Instant parseTimestampOrNull(String input) {
         try {
             return tryParseTimestamp(input);
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
+
 }
